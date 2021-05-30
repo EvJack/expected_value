@@ -69,7 +69,7 @@ def strategy1():
             loose += 1
     games = win + loose
     print("Стратегия №1",
-        f"Общее цисло игр: {games}",
+        f"Общее число игр: {games}",
         f"Выиграно ставок: {str(win)}, ({str(win/games * 100)}%)",
         f"Проиграно ставок: {str(loose)}, ({str(loose/games * 100)}%)",
         sep="\n", end="\n\n")
@@ -96,7 +96,7 @@ def strategy2():
             loose += 1
     games = win + loose
     print("Стратегия №2",
-        f"Общее цисло игр: {games}",
+        f"Общее число игр: {games}",
         f"Выиграно ставок: {str(win)}, ({str(win/games * 100)}%)",
         f"Проиграно ставок: {str(loose)}, ({str(loose/games * 100)}%)",
         sep="\n", end="\n\n")
@@ -123,7 +123,7 @@ def strategy3():
             loose += 1
     games = win + loose
     print("Стратегия №3",
-        f"Общее цисло игр: {games}",
+        f"Общее число игр: {games}",
         f"Выиграно ставок: {str(win)}, ({str(win/games * 100)}%)",
         f"Проиграно ставок: {str(loose)}, ({str(loose/games * 100)}%)",
         sep="\n", end="\n\n")

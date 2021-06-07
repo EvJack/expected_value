@@ -1,188 +1,142 @@
-import random
 import os
+import random
 import numpy as np
 import pandas as pd
-import plotly.graph_objs as go
+import plotly.graph_objs as plotly_go
+from configuration import BET_COEFFICIENT, STOP_POINT, WIN_FIELDS
 
-startmoney = int(input("Введите ваш стартовый баланс: "))
-
-COEFFICIENT = 0.001
-WIN_FIELDS = [
-    2,
-    4,
-    6,
-    8,
-    10,
-    11,
-    13,
-    15,
-    17,
-    20,
-    22,
-    24,
-    26,
-    28,
-    28,
-    29,
-    31,
-    33,
-    35]
-
-STOP_POINT = 40000
-
-balance1 = []
-games1 = []
-
-balance2 = []
-games2 = []
-
-balance3 = []
-games3 = []
+def balance_manipulaion(balance, BET):
+    # balance -= BET if BET < balance else 0
+    if BET > balance:
+        BET = balance
+    balance -= BET
+    return balance
 
 
-def money_manipulaion(money):
-    bet = startmoney * COEFFICIENT
-    if bet > money:
-        bet = money
-    money -= bet
-    return money, bet
+def check_result(balance, win, loose, BET, start_value, end_value):
+    ball = random.randint(start_value, end_value)
+    # (balance += BET * 2) and (win += 1) if ball in WIN_FIELDS else loose += 1
+    if ball in WIN_FIELDS:
+        balance += BET * 2
+        win += 1
+    else:
+        loose += 1
+    return balance, win, loose
 
-
-def strategy1():
-    win = 0
-    loose = 0
-    games = 0
-    money = startmoney
-
-    while money > 0:
-        money, bet = money_manipulaion(money)
-
-        balance1.append(money)
-        games1.append(len(games1) + 1)
-
-        ball = random.randint(0, 36)
-
-        if ball in WIN_FIELDS:
-            money += bet * 2
-            win += 1
-        else:
-            loose += 1
-    games = win + loose
-    print("Стратегия №1",
-        f"Общее цисло игр: {games}",
-        f"Выиграно ставок: {str(win)}, ({str(win/games * 100)}%)",
-        f"Проиграно ставок: {str(loose)}, ({str(loose/games * 100)}%)",
+def print_result(index, win, loose):
+    print(f"Стратегия №{index}",
+        f"Общее число игр: {win + loose}",
+        f"Выиграно ставок: {str(win)}, ({str(win/(win + loose) * 100)}%)",
+        f"Проиграно ставок: {str(loose)}, ({str(loose/(win + loose) * 100)}%)",
         sep="\n", end="\n\n")
 
-
-def strategy2():
+def game_strategy_1(balance, BET, balance_strategy_1):
     win = 0
     loose = 0
-    games = 0
-    money = startmoney
 
-    while (money > 0) and (win + loose < STOP_POINT):
-        money, bet = money_manipulaion(money)
+    while balance > 0:
+        balance = balance_manipulaion(balance, BET)
+        # ball = random.randint(0, 36)
+        balance, win, loose = check_result(balance, win, loose, BET, 0, 36)
+        balance_strategy_1.append(balance)
 
-        balance2.append(money)
-        games2.append(len(games2) + 1)
+    print_result(1, win, loose)
+    return balance_strategy_1
 
-        ball = random.randint(0, 35)
-
-        if ball in WIN_FIELDS:
-            money += bet * 2
-            win += 1
-        else:
-            loose += 1
-    games = win + loose
-    print("Стратегия №2",
-        f"Общее цисло игр: {games}",
-        f"Выиграно ставок: {str(win)}, ({str(win/games * 100)}%)",
-        f"Проиграно ставок: {str(loose)}, ({str(loose/games * 100)}%)",
-        sep="\n", end="\n\n")
-
-
-def strategy3():
+def game_strategy_2(balance, BET, balance_strategy_2):
     win = 0
     loose = 0
-    games = 0
-    money = startmoney
 
-    while (money > 0) and (win + loose < STOP_POINT):
-        money, bet = money_manipulaion(money)
+    while (balance > 0) and (win + loose < STOP_POINT):
+        balance = balance_manipulaion(balance, BET)
+        # ball = random.randint(0, 35)
+        balance, win, loose = check_result(balance, win, loose, BET, 0, 35)
+        balance_strategy_2.append(balance)
 
-        balance3.append(money)
-        games3.append(len(games3) + 1)
+    print_result(2, win, loose)
+    return balance_strategy_2
 
-        ball = random.randint(1, 35)
+def game_strategy_3(balance, BET, balance_strategy_3):
+    win = 0
+    loose = 0
 
-        if ball in WIN_FIELDS:
-            money += bet * 2
-            win += 1
-        else:
-            loose += 1
-    games = win + loose
-    print("Стратегия №3",
-        f"Общее цисло игр: {games}",
-        f"Выиграно ставок: {str(win)}, ({str(win/games * 100)}%)",
-        f"Проиграно ставок: {str(loose)}, ({str(loose/games * 100)}%)",
-        sep="\n", end="\n\n")
+    while (balance > 0) and (win + loose < STOP_POINT):
+        balance = balance_manipulaion(balance, BET)
+        # ball = random.randint(1, 35)
+        balance, win, loose = check_result(balance, win, loose, BET, 1, 35)
+        balance_strategy_3.append(balance)
+
+    print_result(3, win, loose)
+    return balance_strategy_3
 
 
-def graph():
+def count_games(balance_strategy_1, balance_strategy_2, balance_strategy_3):
+    count_games_strategy_1 = [i for i in range(1, len(balance_strategy_1))]
+    count_games_strategy_2 = [i for i in range(1, len(balance_strategy_2))]
+    count_games_strategy_3 = [i for i in range(1, len(balance_strategy_3))]
+
+    return count_games_strategy_1, count_games_strategy_2, count_games_strategy_3
+
+def graph(balance_strategy_1, balance_strategy_2, balance_strategy_3):
     question_graph = input(
         "Хотите ли вы построить графики изменения баланса? [y/n]: ")
 
     if question_graph == "y":
-        fig = go.Figure()
-        fig.add_trace(
-            go.Scatter(
-                x=games1,
-                y=balance1,
+
+        count_games_strategy_1, count_games_strategy_2, count_games_strategy_3 = count_games(balance_strategy_1, balance_strategy_2, balance_strategy_3)
+        figure = plotly_go.Figure()
+        figure.add_trace(
+            plotly_go.Scatter(
+                x=count_games_strategy_1,
+                y=balance_strategy_1,
                 name="Отрицательное матожидание"))
-        fig.add_trace(
-            go.Scatter(
-                x=games2,
-                y=balance2,
+        figure.add_trace(
+            plotly_go.Scatter(
+                x=count_games_strategy_2,
+                y=balance_strategy_2,
                 name="Нулевое матожидание"))
-        fig.add_trace(
-            go.Scatter(
-                x=games3,
-                y=balance3,
+        figure.add_trace(
+            plotly_go.Scatter(
+                x=count_games_strategy_3,
+                y=balance_strategy_3,
                 name="Положительное матожидание"))
 
-        fig.update_layout(legend_orientation="h",
+        figure.update_layout(legend_orientation="h",
                         legend=dict(x=.5, xanchor="center"),
                         title="Изменение баланса с течением времени",
                         xaxis_title="Кол-во игр",
                         yaxis_title="Баланс",
                         margin=dict(l=0, r=0, t=50, b=100)),
-        fig.update_traces(
+        figure.update_traces(
             hoverinfo="all",
             hovertemplate="Игра: %{x}<br>Баланс: %{y}")
 
-        fig.show()
+        figure.show()
 
-
-def savedata():
+def savedata(balance_strategy_1, balance_strategy_2, balance_strategy_3):
 
     question = input(
         "Хотите ли вы сохранить Excel-таблицу с результатами? [y/n]: ")
 
     if question == "y":
-        arr_games1 = np.array(games1)
-        arr_balance1 = np.array(balance1)
-        arr_games2 = np.array(games2)
-        arr_balance2 = np.array(balance2)
-        arr_games3 = np.array(games3)
-        arr_balance3 = np.array(balance3)
 
-        data = {'Кол-во игр 1': arr_games1,
-                'Баланс по стратегии 1': arr_balance1,
-                'Кол-во игр 2': arr_games2,
-                'Баланс по стратегии 2': arr_balance2,
-                'Кол-во игр 3': arr_games3,
-                'Баланс по стратегии 3': arr_balance3,
+        count_games_strategy_1, count_games_strategy_2, count_games_strategy_3 = count_games(balance_strategy_1, balance_strategy_2, balance_strategy_3)
+
+        arr_count_games_strategy_1 = np.array(count_games_strategy_1)
+        arr_balance_strategy_1 = np.array(balance_strategy_1)
+        arr_count_games_strategy_2 = np.array(count_games_strategy_2)
+        arr_balance_strategy_2 = np.array(balance_strategy_2)
+        arr_count_games_strategy_3 = np.array(count_games_strategy_3)
+        arr_balance_strategy_3 = np.array(balance_strategy_3)
+
+        data = {'Кол-во игр 1': arr_count_games_strategy_1,
+                'Баланс по стратегии 1': arr_balance_strategy_1,
+                
+                'Кол-во игр 2': arr_count_games_strategy_2,
+                'Баланс по стратегии 2': arr_balance_strategy_2,
+                
+                'Кол-во игр 3': arr_count_games_strategy_3,
+                'Баланс по стратегии 3': arr_balance_strategy_3,
                 }
 
         df = pd.DataFrame.from_dict(data, orient="index")
@@ -192,13 +146,22 @@ def savedata():
             os.mkdir("result")
         df.to_excel("result/result.xlsx")
 
+    
 
 def main():
-    strategy1()
-    strategy2()
-    strategy3()
-    graph()
-    savedata()
+    balance = int(input("Введите ваш стартовый баланс: "))
+    
+    BET = balance * BET_COEFFICIENT
+
+    balance_strategy_1 = [balance]
+    balance_strategy_2 = [balance]
+    balance_strategy_3 = [balance]
+    
+    game_strategy_1(balance, BET, balance_strategy_1)
+    game_strategy_2(balance, BET, balance_strategy_2)
+    game_strategy_3(balance, BET, balance_strategy_3)
+    graph(balance_strategy_1, balance_strategy_2, balance_strategy_3)
+    savedata(balance_strategy_1, balance_strategy_2, balance_strategy_3)
 
 
 if __name__ == "__main__":

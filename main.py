@@ -1,9 +1,26 @@
 import os
 import random
+import time
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objs as plotly_go
-from configuration import BET_COEFFICIENT, STOP_POINT, WIN_FIELDS
+
+from configuration import *
+
+
+def get_starting_balance():
+    while True:
+        try:
+            start_balance = int(input("Введите ваш стартовый баланс: "))
+            if start_balance <= 0:
+                raise Exception("Баланс должен быть больше нуля. \n")
+        except ValueError:
+            print("Стартовым балансом может являться только целое число.\n")
+        except Exception as ex:
+            print(ex)
+        else:
+            return start_balance
 
 
 def balance_manipulaion(balance, BET):
@@ -11,6 +28,7 @@ def balance_manipulaion(balance, BET):
     if BET > balance:
         BET = balance
     balance -= BET
+
     return balance
 
 
@@ -22,11 +40,13 @@ def check_result(balance, win, loose, BET, start_value, end_value):
         win += 1
     else:
         loose += 1
+
     return balance, win, loose
 
 
 def print_result(index, win, loose):
     print(
+        "\n"
         f"Стратегия №{index}",
         f"Общее число игр: {win + loose}",
         f"Выиграно ставок: {str(win)}, ({str(win/(win + loose) * 100)}%)",
@@ -46,6 +66,7 @@ def game_strategy_1(balance, BET, balance_strategy_1):
         balance_strategy_1.append(balance)
 
     print_result(1, win, loose)
+
     return balance_strategy_1
 
 
@@ -60,6 +81,7 @@ def game_strategy_2(balance, BET, balance_strategy_2):
         balance_strategy_2.append(balance)
 
     print_result(2, win, loose)
+
     return balance_strategy_2
 
 
@@ -78,9 +100,10 @@ def game_strategy_3(balance, BET, balance_strategy_3):
 
 
 def count_games(balance_strategy_1, balance_strategy_2, balance_strategy_3):
-    count_games_strategy_1 = [i for i in range(1, len(balance_strategy_1))]
-    count_games_strategy_2 = [i for i in range(1, len(balance_strategy_2))]
-    count_games_strategy_3 = [i for i in range(1, len(balance_strategy_3))]
+
+    count_games_strategy_1 = [i for i in range(1, len(balance_strategy_1) + 1)]
+    count_games_strategy_2 = [i for i in range(1, len(balance_strategy_2) + 1)]
+    count_games_strategy_3 = [i for i in range(1, len(balance_strategy_3) + 1)]
 
     return count_games_strategy_1, count_games_strategy_2, count_games_strategy_3
 
@@ -150,11 +173,14 @@ def savedata(balance_strategy_1, balance_strategy_2, balance_strategy_3):
         # print(df)
         if not os.path.exists("result"):
             os.mkdir("result")
-        df.to_excel("result/result.xlsx")
+        filename_date = time.strftime("%d_%m_%Y-%H.%M.%S")
+        df.to_excel(f"result/result({filename_date}).xlsx")
+        print("Таблица Excel была сохранена в папку result.")
 
 
 def main():
-    balance = int(input("Введите ваш стартовый баланс: "))
+
+    balance = get_starting_balance()
 
     BET = balance * BET_COEFFICIENT
 

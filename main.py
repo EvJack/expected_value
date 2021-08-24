@@ -25,8 +25,7 @@ def get_starting_balance():
 
 def balance_manipulaion(balance, BET):
     # balance -= BET if BET < balance else 0
-    if BET > balance:
-        BET = balance
+    BET = min(BET, balance)
     balance -= BET
 
     return balance
@@ -170,9 +169,10 @@ def savedata(balance_strategy_1, balance_strategy_2, balance_strategy_3):
 
         df = pd.DataFrame.from_dict(data, orient="index")
         df = df.transpose()
-        # print(df)
+
         if not os.path.exists("result"):
             os.mkdir("result")
+
         filename_date = time.strftime("%d_%m_%Y-%H.%M.%S")
         df.to_excel(f"result/result({filename_date}).xlsx")
         print("Таблица Excel была сохранена в папку result.")

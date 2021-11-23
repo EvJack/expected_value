@@ -135,7 +135,7 @@ def graph(balance_strategy_1, balance_strategy_2, balance_strategy_3):
         figure.update_layout(legend_orientation="h",
                              legend=dict(x=.5, xanchor="center"),
                              title="Изменение баланса с течением времени",
-                             xaxis_title="номер игры по стратегии",
+                             xaxis_title="Порядковый номер игры по стратегии",
                              yaxis_title="Баланс",
                              margin=dict(l=0, r=0, t=50, b=100)),
         figure.update_traces(hoverinfo="all",

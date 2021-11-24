@@ -10,6 +10,15 @@ from configuration import *
 
 
 def get_starting_balance():
+    """[Обработчик ошибок.]
+
+    Raises:
+        Exception: [Обрабатывает ошибки типа, и специальную ошибку, проверку на то, что баланс больше нуля.]
+
+    Returns:
+        [integer]: [Стартовый баланс введенный пользователем.]
+    """
+
     while True:
         try:
             start_balance = int(input("Введите ваш стартовый баланс: "))
@@ -24,7 +33,16 @@ def get_starting_balance():
 
 
 def balance_manipulaion(balance, BET):
-    # balance -= BET if BET < balance else 0
+    """[Функция вычисления баланса перед ставкой.]
+
+    Args:
+        balance ([integer]): [Баланс. Меняется после каждой иттерации.]
+        BET ([integer]): [сумма ставки. Считается коэффициентом от стартового баланса.]
+
+    Returns:
+        [integer]: [сумма ставки.]
+    """
+
     BET = min(BET, balance)
     balance -= BET
 
@@ -32,8 +50,21 @@ def balance_manipulaion(balance, BET):
 
 
 def check_result(balance, win, loose, BET, start_value, end_value):
+    """[проверка того, на какое поле упал "мяч" и сверка с выигрышными полями.]
+
+    Args:
+        balance ([integer]): [Текущий баланс по стратегии.]
+        win ([integer]): [счётчик побед.]
+        loose ([integer]): [счётчик поражений.]
+        BET ([integer]): [текущая ставка.]
+        start_value ([integer]): [первое поле рулетки.]
+        end_value ([integer]): [последнее поле рулетки.]
+
+    Returns:
+        [integer]: [Функция возвращает значение нового баланса и изменение счетчиков побед/поражений.]
+    """
+
     ball = random.randint(start_value, end_value)
-    # (balance += BET * 2) and (win += 1) if ball in WIN_FIELDS else loose += 1
     if ball in WIN_FIELDS:
         balance += BET * 2
         win += 1
@@ -44,6 +75,18 @@ def check_result(balance, win, loose, BET, start_value, end_value):
 
 
 def print_result(index, strategy, win, loose, black, red, all_fields):
+    """[Функция выводит в консоль итоговую информацию по каждой стратегии. Информация выводится сразу после того, как игра по стратегии была завершена.]
+
+    Args:
+        index ([integer]): [Номер стратегии.]
+        strategy ([string]): [Описание по какой стратегии велась игра.]
+        win ([integer]): [счётчик побед.]
+        loose ([integer]): [счётчик поражений.]
+        black ([integer]): [количество черных полей.]
+        red ([integer]): [Количество красных полей.]
+        all_fields ([integer]): [Количество всех полей.]
+    """
+
     print(
         "\n" f"Стратегия №{index}, {strategy}",
         f"Шанс на победу(в процентах): {(black/all_fields) * 100}%",
@@ -57,12 +100,22 @@ def print_result(index, strategy, win, loose, black, red, all_fields):
 
 
 def game_strategy_1(balance, BET, balance_strategy_1):
+    """[Симуляция игры с отрицательным мат.ожиданием.]
+
+    Args:
+        balance ([integer]): [Текущий баланс по стратегии.]
+        BET ([integer]): [текущая ставка.]
+        balance_strategy_1 ([list]): [список заполненный балансом после каждой иттерации.]
+
+    Returns:
+        [list]: [список заполненный балансом по данной симуляции после каждой иттерации.]
+    """
+
     win = 0
     loose = 0
 
     while balance > 0:
         balance = balance_manipulaion(balance, BET)
-        # ball = random.randint(0, 36)
         balance, win, loose = check_result(balance, win, loose, BET, 0, 36)
         balance_strategy_1.append(balance)
 
@@ -72,12 +125,22 @@ def game_strategy_1(balance, BET, balance_strategy_1):
 
 
 def game_strategy_2(balance, BET, balance_strategy_2):
+    """[Симуляция игры с нулевым мат.ожиданием.]
+
+    Args:
+        balance ([integer]): [Текущий баланс по стратегии.]
+        BET ([integer]): [текущая ставка.]
+        balance_strategy_1 ([list]): [список заполненный балансом после каждой иттерации.]
+
+    Returns:
+        [list]: [список заполненный балансом по данной симуляции после каждой иттерации.]
+    """
+
     win = 0
     loose = 0
 
     while (balance > 0) and (win + loose < STOP_POINT):
         balance = balance_manipulaion(balance, BET)
-        # ball = random.randint(0, 35)
         balance, win, loose = check_result(balance, win, loose, BET, 1, 36)
         balance_strategy_2.append(balance)
 
@@ -87,12 +150,22 @@ def game_strategy_2(balance, BET, balance_strategy_2):
 
 
 def game_strategy_3(balance, BET, balance_strategy_3):
+    """[Симуляция игры с положительным мат.ожиданием.]
+
+    Args:
+        balance ([integer]): [Текущий баланс по стратегии.]
+        BET ([integer]): [текущая ставка.]
+        balance_strategy_1 ([list]): [список заполненный балансом после каждой иттерации.]
+
+    Returns:
+        [list]: [список заполненный балансом по данной симуляции после каждой иттерации.]
+    """
+
     win = 0
     loose = 0
 
     while (balance > 0) and (win + loose < STOP_POINT):
         balance = balance_manipulaion(balance, BET)
-        # ball = random.randint(1, 35)
         balance, win, loose = check_result(balance, win, loose, BET, 1, 35)
         balance_strategy_3.append(balance)
 
@@ -102,6 +175,16 @@ def game_strategy_3(balance, BET, balance_strategy_3):
 
 
 def count_games(balance_strategy_1, balance_strategy_2, balance_strategy_3):
+    """[Функция-счетчик. Считает количество игр в каждой симуляции опираясь на данные из списков с балансами.]
+
+    Args:
+        balance_strategy_1 ([list]): [список заполненный балансом после каждой иттерации.]
+        balance_strategy_2 ([list]): [список заполненный балансом после каждой иттерации.]
+        balance_strategy_3 ([list]): [список заполненный балансом после каждой иттерации.]
+
+    Returns:
+        [list]: [список с количеством иттераций в каждой иттерации.]
+    """
 
     count_games_strategy_1 = [i for i in range(1, len(balance_strategy_1) + 1)]
     count_games_strategy_2 = [i for i in range(1, len(balance_strategy_2) + 1)]
@@ -111,6 +194,14 @@ def count_games(balance_strategy_1, balance_strategy_2, balance_strategy_3):
 
 
 def graph(balance_strategy_1, balance_strategy_2, balance_strategy_3):
+    """[эта функция отвечает за отображение графиков. Для отрисовки графиков была использована библиотека Pandas.]
+
+    Args:
+        balance_strategy_1 ([list]): [список заполненный балансом после каждой иттерации.]
+        balance_strategy_2 ([list]): [список заполненный балансом после каждой иттерации.]
+        balance_strategy_3 ([list]): [список заполненный балансом после каждой иттерации.]
+    """
+
     question_graph = input(
         "Хотите ли вы построить графики изменения баланса? [y/n]: ")
 
@@ -145,6 +236,13 @@ def graph(balance_strategy_1, balance_strategy_2, balance_strategy_3):
 
 
 def savedata(balance_strategy_1, balance_strategy_2, balance_strategy_3):
+    """[Данная функция отвечает за создание и сохранение данных в таблицу excel.]
+
+    Args:
+        balance_strategy_1 ([list]): [список заполненный балансом после каждой иттерации.]
+        balance_strategy_2 ([list]): [список заполненный балансом после каждой иттерации.]
+        balance_strategy_3 ([list]): [список заполненный балансом после каждой иттерации.]
+    """
 
     question = input(
         "Хотите ли вы сохранить Excel-таблицу с результатами? [y/n]: ")
@@ -182,6 +280,8 @@ def savedata(balance_strategy_1, balance_strategy_2, balance_strategy_3):
 
 
 def main():
+    """[Главная функция программы, из нее вызываются другие функции и через эту же функцию передаються некоторые данные для вычислений.]
+    """
 
     balance = get_starting_balance()
 
